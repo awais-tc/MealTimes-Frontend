@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -46,14 +45,16 @@ const queryClient = new QueryClient({
 });
 
 // Protected Route Component
-const ProtectedRoute = ({ children, allowedRoles }) => {
+import { ReactNode } from 'react';
+
+const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode; allowedRoles: string[] }) => {
   const { user, isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
   
-  if (!allowedRoles.includes(user.role)) {
+  if (!user || !allowedRoles.includes(user.role)) {
     return <Navigate to="/" />;
   }
   
@@ -65,13 +66,13 @@ const DashboardRedirect = () => {
   const { user } = useAuth();
   
   switch (user?.role) {
-    case 'admin':
+    case 'Admin':
       return <Navigate to="/admin/dashboard" />;
-    case 'corporate':
+    case 'Company':
       return <Navigate to="/corporate/dashboard" />;
-    case 'employee':
+    case 'Employee':
       return <Navigate to="/employee/dashboard" />;
-    case 'chef':
+    case 'Chef':
       return <Navigate to="/chef/dashboard" />;
     default:
       return <Navigate to="/" />;
@@ -99,7 +100,7 @@ function App() {
                   <Route 
                     path="/dashboard" 
                     element={
-                      <ProtectedRoute allowedRoles={['admin', 'corporate', 'employee', 'chef']}>
+                      <ProtectedRoute allowedRoles={['Admin', 'Company', 'Employee', 'Chef']}>
                         <DashboardRedirect />
                       </ProtectedRoute>
                     } 
@@ -109,7 +110,7 @@ function App() {
                   <Route 
                     path="/admin/dashboard" 
                     element={
-                      <ProtectedRoute allowedRoles={['admin']}>
+                      <ProtectedRoute allowedRoles={['Admin']}>
                         <AdminDashboard />
                       </ProtectedRoute>
                     } 
@@ -117,7 +118,7 @@ function App() {
                   <Route 
                     path="/admin/users" 
                     element={
-                      <ProtectedRoute allowedRoles={['admin']}>
+                      <ProtectedRoute allowedRoles={['Admin']}>
                         <UserManagement />
                       </ProtectedRoute>
                     } 
@@ -125,7 +126,7 @@ function App() {
                   <Route 
                     path="/admin/reports" 
                     element={
-                      <ProtectedRoute allowedRoles={['admin']}>
+                      <ProtectedRoute allowedRoles={['Admin']}>
                         <Reports />
                       </ProtectedRoute>
                     } 
@@ -133,7 +134,7 @@ function App() {
                   <Route 
                     path="/admin/feedback" 
                     element={
-                      <ProtectedRoute allowedRoles={['admin']}>
+                      <ProtectedRoute allowedRoles={['Admin']}>
                         <FeedbackManagement />
                       </ProtectedRoute>
                     } 
@@ -141,7 +142,7 @@ function App() {
                   <Route 
                     path="/admin/performance" 
                     element={
-                      <ProtectedRoute allowedRoles={['admin']}>
+                      <ProtectedRoute allowedRoles={['Admin']}>
                         <PlatformPerformance />
                       </ProtectedRoute>
                     } 
@@ -151,7 +152,7 @@ function App() {
                   <Route 
                     path="/corporate/dashboard" 
                     element={
-                      <ProtectedRoute allowedRoles={['corporate']}>
+                      <ProtectedRoute allowedRoles={['Company']}>
                         <CorporateDashboard />
                       </ProtectedRoute>
                     } 
@@ -159,7 +160,7 @@ function App() {
                   <Route 
                     path="/corporate/account" 
                     element={
-                      <ProtectedRoute allowedRoles={['corporate']}>
+                      <ProtectedRoute allowedRoles={['Company']}>
                         <CorporateAccount />
                       </ProtectedRoute>
                     } 
@@ -177,7 +178,7 @@ function App() {
                   <Route 
                     path="/employee/dashboard" 
                     element={
-                      <ProtectedRoute allowedRoles={['employee']}>
+                      <ProtectedRoute allowedRoles={['Employee']}>
                         <EmployeeDashboard />
                       </ProtectedRoute>
                     } 
@@ -185,7 +186,7 @@ function App() {
                   <Route 
                     path="/employee/meals" 
                     element={
-                      <ProtectedRoute allowedRoles={['employee']}>
+                      <ProtectedRoute allowedRoles={['Employee']}>
                         <Meals />
                       </ProtectedRoute>
                     } 
@@ -193,7 +194,7 @@ function App() {
                   <Route 
                     path="/employee/checkout/:mealId" 
                     element={
-                      <ProtectedRoute allowedRoles={['employee']}>
+                      <ProtectedRoute allowedRoles={['Employee']}>
                         <EmployeeCheckout />
                       </ProtectedRoute>
                     } 
@@ -201,7 +202,7 @@ function App() {
                   <Route 
                     path="/employee/orders/:orderId" 
                     element={
-                      <ProtectedRoute allowedRoles={['employee']}>
+                      <ProtectedRoute allowedRoles={['Employee']}>
                         <OrderTracking />
                       </ProtectedRoute>
                     } 
@@ -209,7 +210,7 @@ function App() {
                   <Route 
                     path="/employee/preferences" 
                     element={
-                      <ProtectedRoute allowedRoles={['employee']}>
+                      <ProtectedRoute allowedRoles={['Employee']}>
                         <DietaryPreferences />
                       </ProtectedRoute>
                     } 
@@ -217,7 +218,7 @@ function App() {
                   <Route 
                     path="/employee/feedback" 
                     element={
-                      <ProtectedRoute allowedRoles={['employee']}>
+                      <ProtectedRoute allowedRoles={['Employee']}>
                         <Feedback />
                       </ProtectedRoute>
                     } 
@@ -227,7 +228,7 @@ function App() {
                   <Route 
                     path="/chef/dashboard" 
                     element={
-                      <ProtectedRoute allowedRoles={['chef']}>
+                      <ProtectedRoute allowedRoles={['Chef']}>
                         <ChefDashboard />
                       </ProtectedRoute>
                     } 
@@ -235,7 +236,7 @@ function App() {
                   <Route 
                     path="/chef/profile" 
                     element={
-                      <ProtectedRoute allowedRoles={['chef']}>
+                      <ProtectedRoute allowedRoles={['Chef']}>
                         <ChefProfile />
                       </ProtectedRoute>
                     } 
@@ -243,7 +244,7 @@ function App() {
                   <Route 
                     path="/chef/upload-meal" 
                     element={
-                      <ProtectedRoute allowedRoles={['chef']}>
+                      <ProtectedRoute allowedRoles={['Chef']}>
                         <UploadMeal />
                       </ProtectedRoute>
                     } 
@@ -251,7 +252,7 @@ function App() {
                   <Route 
                     path="/chef/orders" 
                     element={
-                      <ProtectedRoute allowedRoles={['chef']}>
+                      <ProtectedRoute allowedRoles={['Chef']}>
                         <OrderManagement />
                       </ProtectedRoute>
                     } 

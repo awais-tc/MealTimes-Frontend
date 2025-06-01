@@ -1,13 +1,14 @@
 import axios from 'axios';
 
+// Base API setup
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://localhost:7000/api',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add request interceptor to include auth token
+// Add token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -16,7 +17,47 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Admin API
+// Error handler for responses
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:7000';
+
+// ---------- Auth ----------
+export const auth = {
+  login: async (email: string, password: string) => {
+    const response = await api.post('/User/login', { email, password });
+    return response.data;
+  },
+  getCurrentUser: async () => {
+    const response = await api.get('/auth/currentUser');
+    return response.data;
+  },
+
+  // Role-specific registration
+  registerCorporate: async (data: any) => {
+    const response = await axios.post(`${API_URL}/api/User/register/company`, data);
+    return response.data;
+  },
+  registerEmployee: async (data: any) => {
+    const response = await axios.post(`${API_URL}/api/User/register/employee`, data);
+    return response.data;
+  },
+  registerHomeChef: async (data: any) => {
+    const response = await axios.post(`${API_URL}/api/User/register/chef`, data);
+    return response.data;
+  }
+};
+
+// ---------- Admin ----------
 export const admin = {
   getStats: async () => {
     const response = await api.get('/admin/stats');
@@ -40,23 +81,7 @@ export const admin = {
   }
 };
 
-// Auth API
-export const auth = {
-  login: async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
-    return response.data;
-  },
-  register: async (data: any) => {
-    const response = await api.post('/auth/register', data);
-    return response.data;
-  },
-  getCurrentUser: async () => {
-    const response = await api.get('/auth/me');
-    return response.data;
-  }
-};
-
-// Meals API
+// ---------- Meals ----------
 export const meals = {
   getAll: async () => {
     const response = await api.get('/meals');
@@ -80,7 +105,7 @@ export const meals = {
   }
 };
 
-// Nutrition API
+// ---------- Nutrition ----------
 export const nutrition = {
   getMealNutrition: async (mealId: string) => {
     const response = await api.get(`/nutrition/${mealId}`);
@@ -88,7 +113,7 @@ export const nutrition = {
   }
 };
 
-// Rewards API
+// ---------- Rewards ----------
 export const rewards = {
   getPoints: async () => {
     const response = await api.get('/rewards');
@@ -96,7 +121,7 @@ export const rewards = {
   }
 };
 
-// Meal Plans API
+// ---------- Meal Plans ----------
 export const mealPlans = {
   getPlans: async () => {
     const response = await api.get('/meal-plans');
@@ -112,7 +137,7 @@ export const mealPlans = {
   }
 };
 
-// Orders API
+// ---------- Orders ----------
 export const orders = {
   getMyOrders: async () => {
     const response = await api.get('/orders/my-orders');
@@ -132,7 +157,7 @@ export const orders = {
   }
 };
 
-// Corporate API
+// ---------- Corporate ----------
 export const corporate = {
   getAccountDetails: async () => {
     const response = await api.get('/corporate/account');
@@ -148,7 +173,7 @@ export const corporate = {
   }
 };
 
-// Chef API
+// ---------- Chefs ----------
 export const chefs = {
   getProfile: async (id: string) => {
     const response = await api.get(`/chefs/${id}`);
@@ -164,7 +189,7 @@ export const chefs = {
   }
 };
 
-// Support API
+// ---------- Support ----------
 export const support = {
   getFAQs: async () => {
     const response = await api.get('/support/faqs');
@@ -176,7 +201,7 @@ export const support = {
   }
 };
 
-// Events API
+// ---------- Events ----------
 export const events = {
   getUpcoming: async () => {
     const response = await api.get('/events/upcoming');
@@ -188,24 +213,12 @@ export const events = {
   }
 };
 
-// Tracking API
+// ---------- Tracking ----------
 export const tracking = {
   getOrderStatus: async (orderId: string) => {
     const response = await api.get(`/tracking/${orderId}`);
     return response.data;
   }
 };
-
-// Error handler
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
 
 export default api;

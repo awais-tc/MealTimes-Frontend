@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { auth } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -15,16 +14,38 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
+  const { login, user } = useAuth();
+
+  const { register, handleSubmit, formState: { errors }, setError } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
 
-  const loginMutation = useMutation({
-    mutationFn: (data: LoginForm) => auth.login(data.email, data.password),
-    onSuccess: () => {
-      navigate('/dashboard');
-    },
-  });
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      const result =await login(data.email, data.password);
+      console.log("🧠 Result from login():", result);
+    } catch (error) {
+      setError('root', {
+        message: 'Invalid credentials or server error'
+      });
+    }
+  };
+
+  // ✅ This ensures we redirect once user is set from context
+  useEffect(() => {
+    console.log("👀 useEffect saw user change:", user);
+    if (!user) return;
+
+    const roleRoutes: Record<string, string> = {
+      'Admin': '/admin/dashboard',
+      'Company': '/corporate/dashboard',
+      'Employee': '/employee/dashboard',
+      'Chef': '/chef/dashboard'
+    };
+
+    const route = roleRoutes[user.role];
+    if (route) navigate(route);
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-brand-light flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -36,7 +57,7 @@ const Login = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit((data) => loginMutation.mutate(data))}>
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
@@ -71,13 +92,18 @@ const Login = () => {
               </div>
             </div>
 
+            {errors.root && (
+              <div className="rounded-md bg-red-50 p-4">
+                <p className="text-sm text-red-700">{errors.root.message}</p>
+              </div>
+            )}
+
             <div>
               <button
                 type="submit"
-                disabled={loginMutation.isPending}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-red hover:bg-brand-orange focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-red hover:bg-brand-orange focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition-colors"
               >
-                {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+                Sign in
               </button>
             </div>
           </form>
