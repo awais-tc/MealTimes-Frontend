@@ -68,7 +68,7 @@ export const admin = {
     return response.data;
   },
   getUsers: async () => {
-    const response = await api.get('/admin/users');
+    const response = await api.get('/User');
     return response.data;
   },
   deleteUser: async (userId: string) => {
