@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -7,7 +8,7 @@ import Footer from './components/Footer';
 
 // Public Pages
 import Home from './pages/Home';
-import Login from './pages/Login';
+import Login from '../pages/Login';
 import Register from './pages/Register';
 import About from './pages/About';
 import Support from './pages/Support';
@@ -45,9 +46,7 @@ const queryClient = new QueryClient({
 });
 
 // Protected Route Component
-import { ReactNode } from 'react';
-
-const ProtectedRoute = ({ children, allowedRoles }: { children: ReactNode; allowedRoles: string[] }) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles: string[] }> = ({ children, allowedRoles }) => {
   const { user, isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
@@ -168,7 +167,7 @@ function App() {
                   <Route 
                     path="/corporate/checkout/:planId" 
                     element={
-                      <ProtectedRoute allowedRoles={['corporate']}>
+                      <ProtectedRoute allowedRoles={['Company']}>
                         <CorporateCheckout />
                       </ProtectedRoute>
                     } 

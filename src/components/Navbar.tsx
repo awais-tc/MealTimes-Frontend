@@ -17,24 +17,24 @@ export default function Navbar() {
     if (!user) return [];
 
     switch (user.role) {
-      case 'admin':
+      case 'Admin':
         return [
           { to: '/admin/dashboard', label: 'Dashboard' },
           { to: '/admin/users', label: 'Users' },
           { to: '/admin/reports', label: 'Reports' },
         ];
-      case 'corporate':
+      case 'Company':
         return [
           { to: '/corporate/dashboard', label: 'Dashboard' },
           { to: '/corporate/account', label: 'Account' },
         ];
-      case 'employee':
+      case 'Employee':
         return [
           { to: '/employee/dashboard', label: 'Dashboard' },
           { to: '/employee/meals', label: 'Browse Meals' },
           { to: '/employee/orders', label: 'My Orders' },
         ];
-      case 'chef':
+      case 'Chef':
         return [
           { to: '/chef/dashboard', label: 'Dashboard' },
           { to: '/chef/upload-meal', label: 'Upload Meal' },
@@ -48,13 +48,13 @@ export default function Navbar() {
 
   const getRoleIcon = () => {
     switch (user?.role) {
-      case 'admin':
+      case 'Admin':
         return <Settings className="h-5 w-5" />;
-      case 'corporate':
+      case 'Company':
         return <Building2 className="h-5 w-5" />;
-      case 'employee':
+      case 'Employee':
         return <User className="h-5 w-5" />;
-      case 'chef':
+      case 'Chef':
         return <ChefHat className="h-5 w-5" />;
       default:
         return null;
