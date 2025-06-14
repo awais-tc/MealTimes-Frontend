@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import About from './pages/About';
 import Support from './pages/Support';
+import ChefApplication from './pages/ChefApplication';
 
 // Protected Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -46,7 +47,12 @@ const queryClient = new QueryClient({
 });
 
 // Protected Route Component
-const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles: string[] }> = ({ children, allowedRoles }) => {
+type ProtectedRouteProps = {
+  children: React.ReactNode;
+  allowedRoles: string[];
+};
+
+const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const { user, isAuthenticated } = useAuth();
   
   if (!isAuthenticated) {
@@ -57,7 +63,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles: string
     return <Navigate to="/" />;
   }
   
-  return children;
+  return <>{children}</>;
 };
 
 // Role-specific dashboard redirect
@@ -92,6 +98,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/chef-application" element={<ChefApplication />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/support" element={<Support />} />
 

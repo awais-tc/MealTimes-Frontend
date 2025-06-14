@@ -44,15 +44,31 @@ export const auth = {
 
   // Role-specific registration
   registerCorporate: async (data: any) => {
-    const response = await axios.post(`${API_URL}/api/User/register/company`, data);
+    const response = await axios.post(`${API_URL}/User/register/company`, data);
     return response.data;
   },
   registerEmployee: async (data: any) => {
-    const response = await axios.post(`${API_URL}/api/User/register/employee`, data);
+    const response = await axios.post(`${API_URL}/User/register/employee`, data);
     return response.data;
   },
   registerHomeChef: async (data: any) => {
-    const response = await axios.post(`${API_URL}/api/User/register/chef`, data);
+    const response = await axios.post(`${API_URL}/User/register/chef`, data);
+    return response.data;
+  }
+};
+
+// Subscription Plans API
+export const subscriptionPlans = {
+  getAll: async () => {
+    const response = await api.get('/SubscriptionPlan');
+    return response.data;
+  }
+};
+
+// Companies API
+export const companies = {
+  getAll: async () => {
+    const response = await api.get('/CorporateCompany');
     return response.data;
   }
 };
@@ -72,7 +88,7 @@ export const admin = {
     return response.data;
   },
   deleteUser: async (userId: string) => {
-    const response = await api.delete(`/admin/users/${userId}`);
+    const response = await api.delete(`/User/${userId}`);
     return response.data;
   },
   getReports: async () => {
