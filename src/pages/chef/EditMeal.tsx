@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { UtensilsCrossed, Clock, DollarSign, Tag, FileImage, Eye, Upload } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useNavigate, useParams } from 'react-router-dom';
+import { UtensilsCrossed, Clock, DollarSign, Tag, FileImage, Eye, Save } from 'lucide-react';
 import { meals } from '../../lib/api';
-import { useAuth } from '../../contexts/AuthContext';
 
 const mealSchema = z.object({
-  chefID: z.number(),
   mealName: z.string().min(3, 'Meal name must be at least 3 characters'),
   mealDescription: z.string().min(10, 'Description must be at least 10 characters'),
   price: z.number().min(0.01, 'Price must be greater than 0'),
@@ -21,33 +19,40 @@ const mealSchema = z.object({
 
 type MealForm = z.infer<typeof mealSchema>;
 
-const UploadMeal = () => {
+const EditMeal = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { mealId } = useParams();
   const [imagePreview, setImagePreview] = useState<string>('');
   const [imageError, setImageError] = useState<string>('');
 
-  // Extract chef ID from the logged-in user
-  const getChefId = () => {
-  if (user?.homeChef?.chefID) {
-    return user.homeChef.chefID; // ✅ This is the correct key
-  }
-  if (user?.userID) {
-    return user.userID;
-  }
-  return 0;
-};
+  const { data: meal, isLoading } = useQuery({
+    queryKey: ['meal', mealId],
+    queryFn: () => meals.getById(mealId || ''),
+    enabled: !!mealId,
+  });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<MealForm>({
+  const { register, handleSubmit, formState: { errors }, setValue, reset, watch } = useForm<MealForm>({
     resolver: zodResolver(mealSchema),
-    defaultValues: {
-      chefID: getChefId(),
-      availability: true,
-      imageUrl: '',
-    },
   });
 
   const imageUrl = watch('imageUrl');
+
+  useEffect(() => {
+    if (meal?.data) {
+      reset({
+        mealName: meal.data.mealName,
+        mealDescription: meal.data.mealDescription,
+        price: meal.data.price,
+        mealCategory: meal.data.mealCategory,
+        preparationTime: meal.data.preparationTime,
+        imageUrl: meal.data.imageUrl || '',
+        availability: meal.data.availability,
+      });
+      if (meal.data.imageUrl) {
+        setImagePreview(meal.data.imageUrl);
+      }
+    }
+  }, [meal, reset]);
 
   const mealCategories = [
     'Breakfast',
@@ -62,29 +67,19 @@ const UploadMeal = () => {
     'Soup'
   ];
 
-  const uploadMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: async (data: MealForm) => {
-      // Ensure we have a valid chef ID
-      const chefId = getChefId();
-      if (!chefId || chefId === 0) {
-        throw new Error('Chef ID not found. Please ensure you are logged in as a chef.');
-      }
-
-      // Clean up the data before sending
       const cleanData = {
         ...data,
-        chefID: chefId, // Ensure we use the correct chef ID
-        imageUrl: data.imageUrl || null, // Send null if empty string
+        imageUrl: data.imageUrl || null,
       };
-      
-      console.log('Sending meal data:', cleanData); // Debug log
-      return meals.create(cleanData);
+      return meals.update(mealId || '', cleanData);
     },
     onSuccess: () => {
       navigate('/chef/meals');
     },
     onError: (error) => {
-      console.error('Meal creation failed:', error);
+      console.error('Meal update failed:', error);
     },
   });
 
@@ -93,7 +88,6 @@ const UploadMeal = () => {
     setImageError('');
     
     if (url) {
-      // Test if the image loads
       const img = new Image();
       img.onload = () => {
         setImagePreview(url);
@@ -109,23 +103,10 @@ const UploadMeal = () => {
     }
   };
 
-  // Show error if no chef ID is available
-  if (!getChefId() || getChefId() === 0) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <UtensilsCrossed className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Chef Access Required</h1>
-          <p className="text-gray-600 mb-6">
-            You need to be logged in as a chef to upload meals. Please ensure your account has chef privileges.
-          </p>
-          <button
-            onClick={() => navigate('/chef/dashboard')}
-            className="px-4 py-2 bg-brand-red text-white rounded-md hover:bg-brand-orange transition-colors"
-          >
-            Go to Dashboard
-          </button>
-        </div>
+        <div className="text-xl font-semibold">Loading meal...</div>
       </div>
     );
   }
@@ -136,20 +117,10 @@ const UploadMeal = () => {
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="flex items-center mb-8">
             <UtensilsCrossed className="h-8 w-8 text-brand-red mr-3" />
-            <h1 className="text-2xl font-bold text-gray-900">Upload New Meal</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Edit Meal</h1>
           </div>
 
-          {/* Debug info - remove in production */}
-          <div className="mb-4 p-4 bg-gray-100 rounded-lg">
-            <p className="text-sm text-gray-600">
-              <strong>Debug Info:</strong> Chef ID: {getChefId()}, User: {user?.email}
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit((data) => uploadMutation.mutate(data))} className="space-y-8">
-            {/* Hidden Chef ID */}
-            <input type="hidden" {...register('chefID', { valueAsNumber: true })} value={getChefId()} />
-
+          <form onSubmit={handleSubmit((data) => updateMutation.mutate(data))} className="space-y-8">
             {/* Image URL Section */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-4">
@@ -311,15 +282,10 @@ const UploadMeal = () => {
             </div>
 
             {/* Error Display */}
-            {uploadMutation.error && (
+            {updateMutation.error && (
               <div className="rounded-md bg-red-50 p-4">
                 <p className="text-sm text-red-700">
-                  Failed to upload meal. Please try again.
-                  {uploadMutation.error instanceof Error && (
-                    <span className="block mt-1 font-mono text-xs">
-                      {uploadMutation.error.message}
-                    </span>
-                  )}
+                  Failed to update meal. Please try again.
                 </p>
               </div>
             )}
@@ -335,11 +301,11 @@ const UploadMeal = () => {
               </button>
               <button
                 type="submit"
-                disabled={uploadMutation.isPending}
+                disabled={updateMutation.isPending}
                 className="flex items-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand-red hover:bg-brand-orange focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red disabled:opacity-50"
               >
-                <Upload className="h-4 w-4 mr-2" />
-                {uploadMutation.isPending ? 'Uploading...' : 'Upload Meal'}
+                <Save className="h-4 w-4 mr-2" />
+                {updateMutation.isPending ? 'Updating...' : 'Update Meal'}
               </button>
             </div>
           </form>
@@ -349,4 +315,4 @@ const UploadMeal = () => {
   );
 };
 
-export default UploadMeal;
+export default EditMeal;

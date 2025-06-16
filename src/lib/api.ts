@@ -97,26 +97,44 @@ export const admin = {
   }
 };
 
-// ---------- Meals ----------
+// Meals API
 export const meals = {
   getAll: async () => {
-    const response = await api.get('/meals');
+    const response = await api.get('/Meal/all');
     return response.data;
   },
   getById: async (id: string) => {
-    const response = await api.get(`/meals/${id}`);
+    const response = await api.get(`/Meal/${id}`);
     return response.data;
   },
   create: async (data: any) => {
-    const response = await api.post('/meals', data);
+    const response = await api.post('/Meal', data);
     return response.data;
   },
   update: async (id: string, data: any) => {
-    const response = await api.put(`/meals/${id}`, data);
+    const response = await api.put(`/Meal/${id}`, data);
     return response.data;
   },
   delete: async (id: string) => {
-    const response = await api.delete(`/meals/${id}`);
+    const response = await api.delete(`/Meal/${id}`);
+    return response.data;
+  },
+  updateAvailability: async (id: string, availability: boolean) => {
+    const response = await api.patch(`/meals/${id}/availability`, { availability });
+    return response.data;
+  },
+  getChefMeals: async () => {
+    const response = await api.get('/meals/chef');
+    return response.data;
+  },
+  uploadImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await api.post('/meals/upload-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   }
 };

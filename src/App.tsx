@@ -36,6 +36,8 @@ import ChefDashboard from './pages/chef/Dashboard';
 import ChefProfile from './pages/chef/Profile';
 import UploadMeal from './pages/chef/UploadMeal';
 import OrderManagement from './pages/chef/OrderManagement';
+import MealManagement from './pages/chef/MealManagement';
+import EditMeal from './pages/chef/EditMeal';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -252,6 +254,22 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={['Chef']}>
                         <UploadMeal />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/chef/meals" 
+                    element={
+                      <ProtectedRoute allowedRoles={['HomeChef']}>
+                        <MealManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/chef/edit-meal/:mealId" 
+                    element={
+                      <ProtectedRoute allowedRoles={['HomeChef']}>
+                        <EditMeal />
                       </ProtectedRoute>
                     } 
                   />

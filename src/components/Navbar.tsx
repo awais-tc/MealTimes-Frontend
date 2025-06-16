@@ -32,11 +32,12 @@ export default function Navbar() {
         return [
           { to: '/employee/dashboard', label: 'Dashboard' },
           { to: '/employee/meals', label: 'Browse Meals' },
-          { to: '/employee/orders', label: 'My Orders' },
+          { to: '/employee/preferences', label: 'Preferences' },
         ];
       case 'Chef':
         return [
           { to: '/chef/dashboard', label: 'Dashboard' },
+          { to: '/chef/meals', label: 'My Meals' },
           { to: '/chef/upload-meal', label: 'Upload Meal' },
           { to: '/chef/orders', label: 'Orders' },
           { to: '/chef/profile', label: 'Profile' },
