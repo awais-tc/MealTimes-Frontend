@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UtensilsCrossed, Clock, DollarSign, Tag, FileImage, Eye, Save } from 'lucide-react';
 import { meals } from '../../lib/api';
@@ -67,15 +67,19 @@ const EditMeal = () => {
     'Soup'
   ];
 
+  const queryClient = useQueryClient();
+  
   const updateMutation = useMutation({
     mutationFn: async (data: MealForm) => {
       const cleanData = {
         ...data,
+        mealID: Number(mealId), // ✅ Include the mealID in the body
         imageUrl: data.imageUrl || null,
       };
       return meals.update(mealId || '', cleanData);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chef-meals'] });
       navigate('/chef/meals');
     },
     onError: (error) => {

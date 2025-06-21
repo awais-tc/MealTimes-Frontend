@@ -62,6 +62,22 @@ export const subscriptionPlans = {
   getAll: async () => {
     const response = await api.get('/SubscriptionPlan');
     return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/SubscriptionPlan/${id}`);
+    return response.data;
+  },
+  create: async (data: any) => {
+    const response = await api.post('/SubscriptionPlan', data);
+    return response.data;
+  },
+  update: async (id: string, data: any) => {
+    const response = await api.put(`/SubscriptionPlan/${id}`, data);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/SubscriptionPlan/${id}`);
+    return response.data;
   }
 };
 
@@ -107,6 +123,10 @@ export const meals = {
     const response = await api.get(`/Meal/${id}`);
     return response.data;
   },
+  getMealsByChefId: async (chefId: string) => {
+    const response = await api.get(`/Meal/chef/${chefId}`);
+    return response.data;
+  },
   create: async (data: any) => {
     const response = await api.post('/Meal', data);
     return response.data;
@@ -135,6 +155,26 @@ export const meals = {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return response.data;
+  }
+};
+
+// Chefs API
+export const chefs = {
+  getById: async (id: string) => {
+    const response = await api.get(`/HomeChef/${id}`);
+    return response.data;
+  },
+  getProfile: async (id: string) => {
+    const response = await api.get(`/chefs/${id}`);
+    return response.data;
+  },
+  updateProfile: async (data: any) => {
+    const response = await api.put('/chefs/profile', data);
+    return response.data;
+  },
+  getReviews: async (id: string) => {
+    const response = await api.get(`/chefs/${id}/reviews`);
     return response.data;
   }
 };
@@ -203,22 +243,6 @@ export const corporate = {
   },
   getDepartments: async () => {
     const response = await api.get('/corporate/departments');
-    return response.data;
-  }
-};
-
-// ---------- Chefs ----------
-export const chefs = {
-  getProfile: async (id: string) => {
-    const response = await api.get(`/chefs/${id}`);
-    return response.data;
-  },
-  updateProfile: async (data: any) => {
-    const response = await api.put('/chefs/profile', data);
-    return response.data;
-  },
-  getReviews: async (id: string) => {
-    const response = await api.get(`/chefs/${id}/reviews`);
     return response.data;
   }
 };

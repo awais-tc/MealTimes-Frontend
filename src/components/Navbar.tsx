@@ -21,6 +21,7 @@ export default function Navbar() {
         return [
           { to: '/admin/dashboard', label: 'Dashboard' },
           { to: '/admin/users', label: 'Users' },
+          { to: '/admin/subscription-plans', label: 'Subscription Plans' },
           { to: '/admin/reports', label: 'Reports' },
         ];
       case 'Company':

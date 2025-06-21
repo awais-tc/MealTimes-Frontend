@@ -20,6 +20,9 @@ import UserManagement from './pages/admin/UserManagement';
 import Reports from './pages/admin/Reports';
 import FeedbackManagement from './pages/admin/FeedbackManagement';
 import PlatformPerformance from './pages/admin/PlatformPerformance';
+import SubscriptionPlanManagement from './pages/admin/SubscriptionPlanManagement';
+import CreateSubscriptionPlan from './pages/admin/CreateSubscriptionPlan';
+import EditSubscriptionPlan from './pages/admin/EditSubscriptionPlan';
 
 import CorporateDashboard from './pages/corporate/Dashboard';
 import CorporateAccount from './pages/CorporateAccount';
@@ -155,6 +158,30 @@ function App() {
                       </ProtectedRoute>
                     } 
                   />
+                  <Route 
+                    path="/admin/subscription-plans" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Admin']}>
+                        <SubscriptionPlanManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/admin/subscription-plans/create" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Admin']}>
+                        <CreateSubscriptionPlan />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/admin/subscription-plans/edit/:planId" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Admin']}>
+                        <EditSubscriptionPlan />
+                      </ProtectedRoute>
+                    } 
+                  />
 
                   {/* Corporate Routes */}
                   <Route 
@@ -260,7 +287,7 @@ function App() {
                   <Route 
                     path="/chef/meals" 
                     element={
-                      <ProtectedRoute allowedRoles={['HomeChef']}>
+                      <ProtectedRoute allowedRoles={['Chef']}>
                         <MealManagement />
                       </ProtectedRoute>
                     } 
@@ -268,7 +295,7 @@ function App() {
                   <Route 
                     path="/chef/edit-meal/:mealId" 
                     element={
-                      <ProtectedRoute allowedRoles={['HomeChef']}>
+                      <ProtectedRoute allowedRoles={['Chef']}>
                         <EditMeal />
                       </ProtectedRoute>
                     } 

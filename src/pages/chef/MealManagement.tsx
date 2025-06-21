@@ -2,37 +2,45 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Edit, Trash2, Eye, EyeOff, Plus, Search, Filter, Clock, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { meals } from '../../lib/api';
+import { meals, auth } from '../../lib/api';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const MealManagement = () => {
   const queryClient = useQueryClient();
   const { formatPrice } = useCurrency();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedAvailability, setSelectedAvailability] = useState('all');
 
-  const { data: chefMeals, isLoading } = useQuery({
-    queryKey: ['chef-meals'],
-    queryFn: meals.getChefMeals,
-  });
+  const chefId = user?.homeChef?.chefID;
+
+  const { data: chefMealsResponse, isLoading } = useQuery({
+    queryKey: ['chef-meals', chefId],
+     queryFn: () => meals.getMealsByChefId(chefId.toString()),
+    enabled: !!chefId,
+});
+
 
   const toggleAvailabilityMutation = useMutation({
     mutationFn: ({ id, availability }: { id: string; availability: boolean }) =>
       meals.updateAvailability(id, availability),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chef-meals'] });
+      queryClient.invalidateQueries({ queryKey: ['chef-meals', chefId] });
     },
   });
 
   const deleteMealMutation = useMutation({
     mutationFn: (id: string) => meals.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chef-meals'] });
+      queryClient.invalidateQueries({ queryKey: ['chef-meals', chefId] });
     },
   });
 
-  const filteredMeals = chefMeals?.data?.filter((meal: any) => {
+  const chefMeals = chefMealsResponse?.data || [];
+
+  const filteredMeals = chefMeals.filter((meal: any) => {
     const matchesSearch = meal.mealName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          meal.mealDescription.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || meal.mealCategory === selectedCategory;
@@ -42,12 +50,25 @@ const MealManagement = () => {
     return matchesSearch && matchesCategory && matchesAvailability;
   });
 
-  const categories = [...new Set(chefMeals?.data?.map((meal: any) => meal.mealCategory) || [])];
+  const categories = [...new Set(chefMeals.map((meal: any) => meal.mealCategory))];
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-xl font-semibold">Loading meals...</div>
+      </div>
+    );
+  }
+
+  if (!chefId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Chef Access Required</h1>
+          <p className="text-gray-600">
+            You need to be logged in as a chef to manage meals.
+          </p>
+        </div>
       </div>
     );
   }
@@ -113,20 +134,24 @@ const MealManagement = () => {
 
             <div className="flex items-center text-sm text-gray-500">
               <Filter className="h-4 w-4 mr-2" />
-              {filteredMeals?.length || 0} meals found
+              {filteredMeals.length} meals found
             </div>
           </div>
         </div>
 
         {/* Meals Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMeals?.map((meal: any) => (
+          {filteredMeals.map((meal: any) => (
             <div key={meal.mealID} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="relative h-48">
                 <img
                   src={meal.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80'}
                   alt={meal.mealName}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80';
+                  }}
                 />
                 <div className="absolute top-2 right-2">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -163,7 +188,7 @@ const MealManagement = () => {
                   <div className="flex space-x-2">
                     <button
                       onClick={() => toggleAvailabilityMutation.mutate({
-                        id: meal.mealID,
+                        id: meal.mealID.toString(),
                         availability: !meal.availability
                       })}
                       className={`p-2 rounded-md ${
@@ -187,7 +212,7 @@ const MealManagement = () => {
                     <button
                       onClick={() => {
                         if (window.confirm('Are you sure you want to delete this meal?')) {
-                          deleteMealMutation.mutate(meal.mealID);
+                          deleteMealMutation.mutate(meal.mealID.toString());
                         }
                       }}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-md"
@@ -207,7 +232,7 @@ const MealManagement = () => {
         </div>
 
         {/* Empty State */}
-        {filteredMeals?.length === 0 && (
+        {filteredMeals.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
               <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
