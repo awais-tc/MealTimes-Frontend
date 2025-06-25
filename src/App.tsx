@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import About from './pages/About';
 import Support from './pages/Support';
 import ChefApplication from './pages/ChefApplication';
+import DeliveryPersonApplication from './pages/DeliveryPersonApplication';
 
 // Protected Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -27,6 +28,7 @@ import EditSubscriptionPlan from './pages/admin/EditSubscriptionPlan';
 import CorporateDashboard from './pages/corporate/Dashboard';
 import CorporateAccount from './pages/CorporateAccount';
 import CorporateCheckout from './pages/CorporateCheckout';
+import SubscriptionPlans from './pages/corporate/SubscriptionPlans';
 
 import EmployeeDashboard from './pages/employee/Dashboard';
 import EmployeeCheckout from './pages/employee/Checkout';
@@ -41,6 +43,8 @@ import UploadMeal from './pages/chef/UploadMeal';
 import OrderManagement from './pages/chef/OrderManagement';
 import MealManagement from './pages/chef/MealManagement';
 import EditMeal from './pages/chef/EditMeal';
+
+import DeliveryDashboard from './pages/delivery/Dashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +88,8 @@ const DashboardRedirect = () => {
       return <Navigate to="/employee/dashboard" />;
     case 'Chef':
       return <Navigate to="/chef/dashboard" />;
+    case 'DeliveryPerson':
+      return <Navigate to="/delivery/dashboard" />;
     default:
       return <Navigate to="/" />;
   }
@@ -104,6 +110,7 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/chef-application" element={<ChefApplication />} />
+                  <Route path="/delivery-application" element={<DeliveryPersonApplication />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/support" element={<Support />} />
 
@@ -111,7 +118,7 @@ function App() {
                   <Route 
                     path="/dashboard" 
                     element={
-                      <ProtectedRoute allowedRoles={['Admin', 'Company', 'Employee', 'Chef']}>
+                      <ProtectedRoute allowedRoles={['Admin', 'Company', 'Employee', 'Chef', 'DeliveryPerson']}>
                         <DashboardRedirect />
                       </ProtectedRoute>
                     } 
@@ -197,6 +204,14 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={['Company']}>
                         <CorporateAccount />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/corporate/subscription-plans" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Company']}>
+                        <SubscriptionPlans />
                       </ProtectedRoute>
                     } 
                   />
@@ -305,6 +320,16 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={['Chef']}>
                         <OrderManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
+
+                  {/* Delivery Person Routes */}
+                  <Route 
+                    path="/delivery/dashboard" 
+                    element={
+                      <ProtectedRoute allowedRoles={['DeliveryPerson']}>
+                        <DeliveryDashboard />
                       </ProtectedRoute>
                     } 
                   />
