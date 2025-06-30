@@ -234,11 +234,18 @@ const SubscriptionPlansContent = () => {
     setShowPaymentModal(true);
   };
 
-  const handlePaymentSuccess = () => {
-    setShowPaymentModal(false);
-    setSelectedPlan(null);
-    setShowSuccessModal(true);
-  };
+  const queryClient = useQueryClient();
+
+  const handlePaymentSuccess = async () => {
+  setShowPaymentModal(false);
+  setSelectedPlan(null);
+
+  await queryClient.invalidateQueries({
+    queryKey: ['company-details', user?.corporateCompany?.companyID],
+  });
+
+  setShowSuccessModal(true);
+};
 
   const handlePaymentCancel = () => {
     setShowPaymentModal(false);

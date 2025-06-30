@@ -354,7 +354,7 @@ const AdminDashboard = () => {
             <CreditCard className="h-6 w-6 text-brand-red" />
           </div>
           <div className="space-y-4 max-h-64 overflow-y-auto">
-            {allPayments.slice(0, 5).map((payment: any) => (
+            {allPayments.map((payment: any) => (
               <div key={payment.paymentId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
                   <p className="font-medium text-gray-900">{payment.companyName}</p>

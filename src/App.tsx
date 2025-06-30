@@ -28,11 +28,9 @@ import EditSubscriptionPlan from './pages/admin/EditSubscriptionPlan';
 
 import CorporateDashboard from './pages/corporate/Dashboard';
 import CorporateAccount from './pages/CorporateAccount';
-import CorporateCheckout from './pages/CorporateCheckout';
 import SubscriptionPlans from './pages/corporate/SubscriptionPlans';
 
 import EmployeeDashboard from './pages/employee/Dashboard';
-import EmployeeCheckout from './pages/employee/Checkout';
 import DietaryPreferences from './pages/employee/DietaryPreferences';
 import Feedback from './pages/employee/Feedback';
 import Meals from './pages/Meals';
@@ -221,15 +219,6 @@ function App() {
                       </ProtectedRoute>
                     } 
                   />
-                  <Route 
-                    path="/corporate/checkout/:planId" 
-                    element={
-                      <ProtectedRoute allowedRoles={['Company']}>
-                        <CorporateCheckout />
-                      </ProtectedRoute>
-                    } 
-                  />
-
                   {/* Employee Routes */}
                   <Route 
                     path="/employee/dashboard" 
@@ -244,14 +233,6 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={['Employee']}>
                         <Meals />
-                      </ProtectedRoute>
-                    } 
-                  />
-                  <Route 
-                    path="/employee/checkout/:mealId" 
-                    element={
-                      <ProtectedRoute allowedRoles={['Employee']}>
-                        <EmployeeCheckout />
                       </ProtectedRoute>
                     } 
                   />
