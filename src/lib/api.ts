@@ -303,7 +303,7 @@ export const orders = {
     return response.data;
   },
   cancelOrder: async (orderId: number) => {
-    const response = await api.delete(`/Order/cancel/${orderId}`);
+    const response = await api.patch(`/Order/cancel/${orderId}`);
     return response.data;
   }
 };
