@@ -357,6 +357,24 @@ export const payments = {
   }
 };
 
+// ---------- Dietary Preferences ----------
+export const dietaryPreferences = {
+  getById: async (employeeId: string) => {
+    const response = await api.get(`/dietary-preferences/${employeeId}`);
+    return response.data;
+  },
+  createOrUpdate: async (employeeId: string, data: {
+    employeeId: number;
+    allergies: string[];
+    preferences: string[];
+    restrictions: string[];
+    customNotes?: string;
+  }) => {
+    const response = await api.post(`/dietary-preferences/${employeeId}`, data);
+    return response.data;
+  }
+};
+
 // ---------- Support ----------
 export const support = {
   getFAQs: async () => {
