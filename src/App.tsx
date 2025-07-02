@@ -42,7 +42,7 @@ import UploadMeal from './pages/chef/UploadMeal';
 import OrderManagement from './pages/chef/OrderManagement';
 import MealManagement from './pages/chef/MealManagement';
 import EditMeal from './pages/chef/EditMeal';
-
+import ResetPassword from './pages/ResetPassword';
 import DeliveryDashboard from './pages/delivery/Dashboard';
 
 const queryClient = new QueryClient({
@@ -112,6 +112,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/chef-application" element={<ChefApplication />} />
                   <Route path="/delivery-application" element={<DeliveryPersonApplication />} />
                   <Route path="/meals" element={<PublicMeals />} />
