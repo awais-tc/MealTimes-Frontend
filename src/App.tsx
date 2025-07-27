@@ -43,6 +43,10 @@ import OrderManagement from './pages/chef/OrderManagement';
 import MealManagement from './pages/chef/MealManagement';
 import EditMeal from './pages/chef/EditMeal';
 import ResetPassword from './pages/ResetPassword';
+import LocationManagement from './pages/admin/LocationManagement';
+import ChefLocationSetup from './pages/chef/LocationSetup';
+import CompanyLocationSetup from './pages/corporate/LocationSetup';
+import NearbyMeals from './pages/employee/NearbyMeals';
 import DeliveryDashboard from './pages/delivery/Dashboard';
 
 const queryClient = new QueryClient({
@@ -194,6 +198,14 @@ function App() {
                       </ProtectedRoute>
                     } 
                   />
+                  <Route 
+                    path="/admin/locations" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Admin']}>
+                        <LocationManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
 
                   {/* Corporate Routes */}
                   <Route 
@@ -217,6 +229,14 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={['Company']}>
                         <SubscriptionPlans />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/corporate/location-setup" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Company']}>
+                        <CompanyLocationSetup />
                       </ProtectedRoute>
                     } 
                   />
@@ -258,6 +278,14 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={['Employee']}>
                         <Feedback />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/employee/nearby-meals" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Employee']}>
+                        <NearbyMeals />
                       </ProtectedRoute>
                     } 
                   />
@@ -308,6 +336,14 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={['Chef']}>
                         <OrderManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/chef/location-setup" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Chef']}>
+                        <ChefLocationSetup />
                       </ProtectedRoute>
                     } 
                   />
