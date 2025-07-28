@@ -48,6 +48,7 @@ import ChefLocationSetup from './pages/chef/LocationSetup';
 import CompanyLocationSetup from './pages/corporate/LocationSetup';
 import NearbyMeals from './pages/employee/NearbyMeals';
 import DeliveryDashboard from './pages/delivery/Dashboard';
+import BusinessManagement from './pages/admin/BusinessManagement';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -203,6 +204,14 @@ function App() {
                     element={
                       <ProtectedRoute allowedRoles={['Admin']}>
                         <LocationManagement />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/admin/business" 
+                    element={
+                      <ProtectedRoute allowedRoles={['Admin']}>
+                        <BusinessManagement />
                       </ProtectedRoute>
                     } 
                   />
